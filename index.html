@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./style.css">
+    
+        <title>Yellow-Sic Development</title>
+        <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" /> -->
+    </head>
+    <body>
+        <nav class="menu">
+           
+                
+            <a href="#">Configuration</a>
+            
+            <a href="#"> Licht-Quelle</a>
+            
+            <a href="#"> Signale</a>
+
+           
+        </nav>
+        <div class="start">
+            <button onclick="test()">Starten</button>
+            <button>Stopen</button>
+        </div>
+
+
+        <div class="content">
+            <div class="eingabefeld">
+                <input  type="text" placeholder="Start Spannung [V]">
+                <input type="text" placeholder="End Spannung [V]">
+                <input type="text" placeholder="Diffrenz Spannung [V]">
+                <button type="submit">Inzializieren</button>
+            </div>
+            <div id="gd"></div>
+            <div id="message"></div>
+            <div class="chart">
+                <canvas id="myChart1" style="width:500px;height: 250px;"></canvas>
+            </div>
+
+        </div>
+        
+
+
+
+    
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/min/moment.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@1.8.0"></script> 
+        <!-- <script src="https://cdn.plot.ly/plotly-2.18.0.min.js"></script>-->
+        <script type="module" src="./main.js"></script>
+
+        
+    </body>
+    
+    <footer>
+        <div id="myinput" class="progressbar">Progressbar</div>
+    </footer>
+</html>
