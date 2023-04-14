@@ -13,12 +13,12 @@ path: str = ''
 #[server]
 #or "server" or "alone"
 run_it: str = 'alone'
-how_many_times: int = 3
+how_many_times = 3
 #modus test or electrolyse
 modus = 'electrolyse'
 
 #[electrolyse]
-file_name: str = 'TM_Edelstahl_Edelstahl'
+file_name: str = None
 probe_nr:str = 'L0001'
 comments: str = 'TestMessung_KOH25'
 u_min: int = 2
