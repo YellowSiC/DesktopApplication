@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Title</title>
+        <!-- Required basic library -->
+        <script src="{{ url_for('static', path='/JsPyTextSocket.js') }}"></script>
+        <!-- Extension library to load depending on the function used -->
+        <script src="{{ url_for('static', path='/JsPyFunction.js') }}"></script>
+        <script src="{{ url_for('static', path='/JsPyQueue.js') }}"></script>
+        <script src="{{ url_for('static', path='/JsPyPubsub.js') }}"></script>
+
+        <script src="{{ url_for('static', path='/react.development.js') }}" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', path='/react-dom.development.js') }}"></script>
+        <script src="{{ url_for('static', path='/babel.min.js') }}" crossorigin="anonymous"></script>
+
+        <!-- Ant Design Components and Icons -->
+        <script src="{{ url_for('static', path='/antd.min.js') }}"></script>
+        <script src="{{ url_for('static', path='/antd.min.js.map') }}"></script>
+        <script src="{{ url_for('static', path='/index.umd.min.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static', path='/antd.min.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', path='/antd.min.css.map') }}" />
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const { Space, Input, Button, Layout } = antd;
+            const { Header, Content } = Layout;
+            const { Html5Outlined, EditOutlined } = icons;
+     
+            {{ main | safe }}
+     
+            ReactDOM.render(
+                <App />,
+                document.querySelector('#root'),
+            );
+        </script>
+    </body>
+</html>
