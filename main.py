@@ -9,7 +9,7 @@ from datetime import datetime
 from nicegui import ui
 from nicegui.events import ValueChangeEventArguments
 data = []
-myarray = {}
+myarray = []
 
 
 class imp_data:                     #class data for locked sharing
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                         with ui.row():
                             with ui.row():
                                 U_START = ui.input('U-START [V]')
-                                myarray(U_START.value)
+                               
                                 U_STOP = ui.input('U-STOP [V]')
                                 u_max = ui.input(label='u_max')
                             with ui.row():
@@ -320,7 +320,7 @@ if __name__ == "__main__":
         ui.button('Start', on_click = btn_click)
         ui.button('Button', on_click= lambda: ui.notify('Click')) """
 
-        ui.run(title='Yellow-SiC Development',view='app', width=800, height=800, confirm_close= True)
+        ui.run(native=True)
         p1.join()        
 
 
