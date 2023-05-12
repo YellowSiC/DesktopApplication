@@ -8,20 +8,19 @@ import random
 from datetime import datetime
 from nicegui import ui
 from nicegui.events import ValueChangeEventArguments
-data = []
-myarray = []
+import globals as glob
 
 
 class imp_data:                     #class data for locked sharing
     def __init__(self):
-        self.file_name = 'name'
+        self.file_name= 'name'
         self.probe_nr = '0'
         self.comments = 'no comment'
         #________ Erste Feld______
         self.u_min = 0.0
         self.u_max = 3.0
         self.delta_u = 0.2
-        self.t_meas = 20000.0 #ms
+        self.t_meas = glob.t_meas[0]
         self.I    = 0.0
         self.U    = 0.0
         self.modus = 0
@@ -44,6 +43,27 @@ class SM(Enum):                     #Enum type
     STOP        = 5
     CANCEL      = 6
 
+
+""" def initial():
+        run_it.value              = S_DATA.STATE_MACHINE.value
+        run_it.value              = S_DATA.STATE_MACHINE.value
+        how_many_times.value      = S_DATA.STATE_MACHINE.value
+        modus.value               = S_DATA.STATE_MACHINE.value
+        CONNECTED.value           = S_DATA.STATE_MACHINE.value
+        VOLTAGE.value             = S_DATA.STATE_MACHINE.value
+        BAUDRATE.value            = S_DATA.STATE_MACHINE.value
+        PORT.value                = S_DATA.STATE_MACHINE.value
+        BYTESIZE.value            = S_DATA.STATE_MACHINE.value
+        PARITY.value              = S_DATA.STATE_MACHINE.value
+        STOPBITS.value            = S_DATA.STATE_MACHINE.value
+        TIMEOUT.value             = S_DATA.STATE_MACHINE.value
+        RES.value                 = S_DATA.STATE_MACHINE.value
+        UPPER_LIMIT.value         = S_DATA.STATE_MACHINE.value
+ """
+
+
+
+
 class S_DATA(Enum):                 #Enum type
     STATE_MACHINE   = 0
     MODUS           = 1
@@ -62,6 +82,11 @@ class S_DATA(Enum):                 #Enum type
     SIG_SN          = 14
     FIRMWARE        = 15
 
+
+
+
+   
+
 class classMultiPros:
     def __init__(self):  
         self.init = 0
@@ -70,30 +95,34 @@ class classMultiPros:
         while True:
             SMach = int(server_data[S_DATA.STATE_MACHINE.value])
             if SMach == SM.INIT.value:
-                print("vai")
-                sleep(10)
+
+
                 server_data[S_DATA.STATE_MACHINE.value] = SM.READY.value
             elif SMach == SM.RUNNING.value:
-                sleep(2)
+
+
                 server_data[S_DATA.STATE_MACHINE.value] = SM.MEASURING.value
-            elif SMach == SM.MEASURING.value:
-                sleep(10)
-                server_data[S_DATA.STATE_MACHINE.value] = SM.STOP.value
+
+
             elif SMach == SM.CANCEL.value:
-                sleep(10)
                 server_data[S_DATA.STATE_MACHINE.value] = SM.READY.value
+
             elif SMach == SM.STOP.value:    
-                sleep(10)
+
+
                 server_data[S_DATA.STATE_MACHINE.value] = SM.READY.value
+
+
            
             server_data[S_DATA.I.value] = random.randint(0,10)
-            server_data[S_DATA.U.value] = random.randint(0,10)
-            sleep(1)
 
-#if __name__ in {"__main__", "__mp_main__"}:     
+            server_data[S_DATA.U.value] = random.randint(0,10)
+
+
+    
 if __name__ == "__main__":
     with Manager() as manager:
-        #shared data Manages from intern class
+
         imp_data2 =imp_data()
         data = imp_data2.server_data()
         shared_list = manager.list(data)
@@ -101,12 +130,13 @@ if __name__ == "__main__":
         p1 = Process(target = MultPros.th, args=(shared_list,))
         p1.start() 
         sleep(3)
-        #######################################SERVER CODE################################################################################################
+
         with ui.tabs() as tabs:
             ui.tab('Home', icon='home').style('color: black')
             ui.tab('Lichtquelle', icon='wb_sunny').style('color: black')
             ui.tab('Siglent', icon='device_hub').style('color: black')
             ui.tab('Settings', icon='settings').style('color: black')
+            ui.tab('User-Settings', icon='webhook').style('color: black')
         
 
         with ui.tab_panels(tabs, value='Home'):
@@ -117,7 +147,8 @@ if __name__ == "__main__":
                         with ui.row():
                             with ui.row():
                                 U_START = ui.input('U-START [V]')
-                               
+                                
+                                
                                 U_STOP = ui.input('U-STOP [V]')
                                 u_max = ui.input(label='u_max')
                             with ui.row():
@@ -150,7 +181,6 @@ if __name__ == "__main__":
                     line_plot_spannung = ui.line_plot(n=1, limit=120000, figsize=(8, 6), update_every=5).with_legend(['Spannung'], loc='upper center', ncol=4)
 
                     def btn_click() -> None:
-                            print("Btn clicked")
                             if (shared_list[S_DATA.STATE_MACHINE.value]==SM.READY.value):
                                 shared_list[S_DATA.STATE_MACHINE.value] = SM.RUNNING.value
 
@@ -162,19 +192,42 @@ if __name__ == "__main__":
 
                         line_plot_strom.push([now], [[float(shared_list[S_DATA.I.value])]])
                         line_plot_spannung.push([now], [[float(shared_list[S_DATA.U.value])]])
-                        print("I ",shared_list[S_DATA.I.value]," U ",shared_list[S_DATA.U.value],"SM ",shared_list[S_DATA.STATE_MACHINE.value])
+                        #print("I ",shared_list[S_DATA.I.value]," U ",shared_list[S_DATA.U.value],"SM ",shared_list[S_DATA.STATE_MACHINE.value])
                         
                     line_updates = ui.timer(0.1, update_line_plot, active=False)
+
                     def update_start(): 
                         if (shared_list[S_DATA.STATE_MACHINE.value] is not SM.READY.value):
-                                shared_list[S_DATA.STATE_MACHINE.value] = SM.RUNNING.value                   
-                                line_updates.active = True
+                                shared_list[S_DATA.STATE_MACHINE.value] = SM.RUNNING.value 
+
+                        elif (shared_list[S_DATA.STATE_MACHINE.value] is not SM.PAUSE.value):
+                                shared_list[S_DATA.STATE_MACHINE.value] = SM.RUNNING.value 
+
+
+                        line_updates.active = True
+
+
+                    def update_pause():
+                            if (shared_list[S_DATA.STATE_MACHINE.value]==SM.MEASURING.value):
+                                shared_list[S_DATA.STATE_MACHINE.value] = SM.PAUSE.value
+                                line_updates.active = False
+                    
                     def update_stop():
-                            line_updates.active = False
+                            if (shared_list[S_DATA.STATE_MACHINE.value]==SM.MEASURING.value):
+                                shared_list[S_DATA.STATE_MACHINE.value] = SM.STOP.value
+                                line_updates.active = False
+                    
+                    def update_cancel():
+                            if (shared_list[S_DATA.STATE_MACHINE.value]==SM.MEASURING.value):
+                                shared_list[S_DATA.STATE_MACHINE.value] = SM.CANCEL.value
+                                line_updates.active = False
 
                 start_button = ui.button('START', on_click=update_start).style('margin: 10px')
-                stop_button = ui.button('STOP', on_click=update_stop)
-                        #line_checkbox = ui.checkbox('active').bind_value(line_updates, 'active')
+                pause_button = ui.button('Pause', on_click=update_pause).style('margin: 10px')
+                stop_button = ui.button('STOP', on_click=update_stop).style('margin: 10px')
+                cancel_button = ui.button('cancel', on_click=update_cancel).style('margin: 10px')
+                
+                      
 
 
 
@@ -257,17 +310,16 @@ if __name__ == "__main__":
                             with ui.row():
                                 siglent_ip = ui.input(label='Siglent-IP')
                                 siglent_port = ui.input(label='Siglent-Port')
-                                ui.update(siglent_ip)
-                                ui.update(siglent_port)
+                                
+                              
                             
                             with ui.label('Server').classes('top-right'):
                                 with ui.row():
                                     run_it = ui.input(label='run_it')
                                     how_many_times = ui.input(label='how_many_times')
-                                    modus = ui.input(label='modus')   
-                                    ui.update(siglent_ip)
-                                    ui.update(siglent_port)
-                                    ui.update(siglent_port)
+                                    modus = ui.input(label='modus')
+                                     
+                               
                                     
 
                                     
@@ -275,59 +327,90 @@ if __name__ == "__main__":
                             
                             with ui.label('Arduino'):
                                 with ui.row():
-                                    CONNECTED = ui.input(label='CONNECTED')
-                                    VOLTAGE = ui.input(label='VOLTAGE')
-                                    BAUDRATE = ui.input(label='BAUDRATE')
-                                    PORT = ui.input(label='PORT')
+                                    CONNECTED = ui.input(label='CONNECTED') 
+                                    VOLTAGE = ui.input(label='VOLTAGE')                                     
+                                    BAUDRATE = ui.input(label='BAUDRATE')                                     
+                                    PORT = ui.input(label='PORT')                                     
                                     BYTESIZE = ui.input(label='BYTESIZE')
+                                     
                                 with ui.row():
                                     PARITY = ui.input(label='PARITY')
                                     STOPBITS = ui.input(label='STOPBITS')
                                     TIMEOUT = ui.input(label='TIMEOUT')
                                     RES = ui.input(label='RES')
                                     UPPER_LIMIT = ui.input(label='UPPER_LIMIT')
+                                    
+
+                        def initial():
+                            pass
+                            """ siglent_ip.value          = S_DATA.STATE_MACHINE.value
+                            siglent_port.value        = S_DATA.STATE_MACHINE.value
+                            run_it.value              = S_DATA.STATE_MACHINE.value
+                            run_it.value              = S_DATA.STATE_MACHINE.value
+                            how_many_times.value      = S_DATA.STATE_MACHINE.value
+                            modus.value               = S_DATA.STATE_MACHINE.value
+                            CONNECTED.value           = S_DATA.STATE_MACHINE.value
+                            VOLTAGE.value             = S_DATA.STATE_MACHINE.value
+                            BAUDRATE.value            = S_DATA.STATE_MACHINE.value
+                            PORT.value                = S_DATA.STATE_MACHINE.value
+                            BYTESIZE.value            = S_DATA.STATE_MACHINE.value
+                            PARITY.value              = S_DATA.STATE_MACHINE.value
+                            STOPBITS.value            = S_DATA.STATE_MACHINE.value
+                            TIMEOUT.value             = S_DATA.STATE_MACHINE.value
+                            RES.value                 = S_DATA.STATE_MACHINE.value
+                            UPPER_LIMIT.value         = S_DATA.STATE_MACHINE.value
+ """
 
 
                        
 
-                        mybutton = ui.button('initialisiren')
+                        mybutton = ui.button('initialisiren', on_click= initial)
                         with ui.card():
                                 ui.label('CMD HISTORY')
                                 array = ui.textarea().style('width: 900px; height: 200px;')
 
+        with ui.tab_panels(tabs, value='User-Settings'):
+            with ui.tab_panel('User-Settings'):
+                with ui.card():
+                    with ui.column():
+                        with ui.row():
+                            STATE_MACHINE   = ui.input(label='STATE_MACHINE') 
+                            MODUS           = ui.input(label='MODUS') 
+                            ERROR           = ui.input(label='ERROR') 
+                            PROGRESS        = ui.input(label='PROGRESS') 
+                            FILE_NAME       = ui.input(label='FILE_NAME') 
+                            PROBE_NR        = ui.input(label='PROBE_NR') 
+                            COMMENTS        = ui.input(label='COMMENTS') 
+                            U_MIN           = ui.input(label='U_MIN') 
+                            U_MAX           = ui.input(label='U_MAX') 
+                            DELTA_U         = ui.input(label='DELTA_U') 
+                            T_MEAS          = ui.input(label='T_MEAS') 
+                            I               = ui.input(label='I') 
+                            U               = ui.input(label='U') 
+                            TIME_P          = ui.input(label='TIME_P') 
+                            SIG_SN          = ui.input(label='SIG_SN') 
+                            FIRMWARE        = ui.input(label='FIRMWARE') 
 
 
-        
+                            def initial_a():
+                                shared_list[S_DATA.STATE_MACHINE.value] =STATE_MACHINE.value
+                                shared_list[S_DATA.MODUS.value] = MODUS.value 
+                                shared_list[S_DATA.ERROR.value] = ERROR.value
+                                shared_list[S_DATA.PROGRESS.value] = PROGRESS.value
+                                shared_list[S_DATA.FILE_NAME.value]  = str(FILE_NAME.value) 
+                                shared_list[S_DATA.COMMENTS.value] = COMMENTS.value
+                                shared_list[S_DATA.U_MIN.value] = U_MIN.value 
+                                shared_list[S_DATA.U_MAX.value] = U_MAX.value 
+                                shared_list[S_DATA.DELTA_U.value] = DELTA_U.value 
+                                shared_list[S_DATA.T_MEAS.value] = T_MEAS.value
+                                shared_list[S_DATA.I.value] = I.value 
+                                shared_list[S_DATA.U.value] = U.value  
+                                shared_list[S_DATA.TIME_P.value] = TIME_P.value 
+                                shared_list[S_DATA.SIG_SN.value] =SIG_SN.value 
+                                shared_list[S_DATA.FIRMWARE.value]=FIRMWARE.value 
+                          
+                        my_button = ui.button('SAVE', on_click= initial_a)
 
 
-
-
-        """ line_plot = ui.line_plot(n=2, limit=20, figsize=(3, 2), update_every=5) \
-        .with_legend(['sin', 'cos'], loc='upper center', ncol=2)
-
-        
-        def update_line_plot() -> None:
-            now = datetime.now()
-            x = now.timestamp()
-            y1 = np.sin(x)
-            y2 = np.cos(x)
-            line_plot.push([now], [[float(shared_list[S_DATA.I.value])], [float(shared_list[S_DATA.U.value])]])
-            print("I ",shared_list[S_DATA.I.value]," U ",shared_list[S_DATA.U.value],"SM ",shared_list[S_DATA.STATE_MACHINE.value])
-
-
-        line_updates = ui.timer(0.1, update_line_plot, active=False)
-        line_checkbox = ui.checkbox('active').bind_value(line_updates, 'active')
-        ui.button('Start', on_click = btn_click)
-        ui.button('Button', on_click= lambda: ui.notify('Click')) """
-
-        ui.run(native=True)
-        p1.join()        
-
-
-  
-
-
-
-
-
-
+        ui.run(title='Yellow-SiC Development',view='app', width=800, height=800, confirm_close= True)
+        p1.join()     
